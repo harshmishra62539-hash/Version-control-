@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Communication Toolkit — Engineering Students</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0f1b2d;
+    --navy2: #162236;
+    --navy3: #1e3050;
+    --blue: #2563eb;
+    --blue2: #3b82f6;
+    --cyan: #06b6d4;
+    --cream: #f5f0e8;
+    --gold: #f59e0b;
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --border: rgba(255,255,255,0.08);
+    --card: rgba(255,255,255,0.04);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--navy);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+ 
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+ 
+  /* Glow orbs */
+  .orb1, .orb2 {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    filter: blur(80px);
+    opacity: 0.18;
+  }
+  .orb1 { width: 500px; height: 500px; background: var(--blue); top: -100px; right: -100px; }
+  .orb2 { width: 400px; height: 400px; background: var(--cyan); bottom: -80px; left: -80px; }
+ 
+  .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+ 
+  /* Header */
+  header {
+    padding: 40px 24px 32px;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  .team-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(37,99,235,0.15);
+    border: 1px solid rgba(37,99,235,0.3);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--blue2);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .team-badge::before { content: '●'; font-size: 8px; color: var(--cyan); }
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #fff 0%, var(--blue2) 60%, var(--cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .subtitle {
+    color: var(--text2);
+    font-size: 16px;
+    font-weight: 300;
+    margin-bottom: 32px;
+  }
+ 
+  /* Nav tabs */
+  .nav {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+    position: relative;
+    z-index: 1;
+    padding: 0 24px;
+  }
+  .nav-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 18px;
+    color: var(--text2);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-btn:hover { border-color: rgba(37,99,235,0.4); color: var(--text); }
+  .nav-btn.active {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: #fff;
+  }
+ 
+  /* Sections */
+  .section { display: none; }
+  .section.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+ 
+  /* Cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(37,99,235,0.25); }
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: #fff;
+  }
+  .card-sub {
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 20px;
+  }
+ 
+  /* Email templates */
+  .email-box {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+  }
+  .email-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--cyan);
+    margin-bottom: 10px;
+  }
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 14px;
+    color: var(--text2);
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+  }
+  .copy-btn:hover { border-color: var(--blue2); color: var(--blue2); }
+  .copy-btn.copied { border-color: #10b981; color: #10b981; }
+ 
+  /* Tips grid */
+  .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin-bottom: 16px; }
+  .tip-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    transition: all 0.2s;
+  }
+  .tip-card:hover { background: rgba(37,99,235,0.08); border-color: rgba(37,99,235,0.25); transform: translateY(-2px); }
+  .tip-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: rgba(37,99,235,0.3);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .tip-title { font-size: 14px; font-weight: 500; color: #fff; margin-bottom: 6px; }
+  .tip-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+ 
+  /* Do/Don't */
+  .dos-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 540px) { .dos-grid { grid-template-columns: 1fr; } }
+  .do-box { background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.2); border-radius: 12px; padding: 18px; }
+  .dont-box { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 12px; padding: 18px; }
+  .do-title { font-size: 13px; font-weight: 600; color: #10b981; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .dont-title { font-size: 13px; font-weight: 600; color: #ef4444; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .do-box li, .dont-box li { font-size: 13px; color: var(--text); line-height: 1.6; margin-left: 16px; margin-bottom: 6px; }
+ 
+  /* Resume */
+  .resume-steps { counter-reset: step; }
+  .resume-step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .resume-step:last-child { border-bottom: none; }
+  .step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(37,99,235,0.2);
+    border: 1px solid rgba(37,99,235,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--blue2);
+    flex-shrink: 0;
+  }
+  .step-content .step-title { font-size: 14px; font-weight: 500; color: #fff; margin-bottom: 3px; }
+  .step-content .step-desc { font-size: 13px; color: var(--text2); }
+ 
+  /* LinkedIn table */
+  .li-table { width: 100%; border-collapse: collapse; }
+  .li-table th { text-align: left; padding: 10px 14px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text2); border-bottom: 1px solid var(--border); }
+  .li-table td { padding: 12px 14px; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: top; }
+  .li-table tr:last-child td { border-bottom: none; }
+  .li-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .li-section { color: var(--cyan); font-weight: 500; white-space: nowrap; }
+ 
+  /* AI Tools */
+  .tool-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+  .tool-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    transition: all 0.2s;
+  }
+  .tool-card:hover { border-color: rgba(37,99,235,0.3); transform: translateY(-2px); }
+  .tool-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+  .tool-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .tool-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+ 
+  /* Meeting */
+  .meeting-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .meeting-item:last-child { border-bottom: none; }
+  .meeting-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+  .meeting-text .mtitle { font-size: 14px; font-weight: 500; color: #fff; margin-bottom: 3px; }
+  .meeting-text .mdesc { font-size: 13px; color: var(--text2); }
+ 
+  /* Report structure */
+  .report-flow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 20px; }
+  .report-node {
+    background: rgba(37,99,235,0.12);
+    border: 1px solid rgba(37,99,235,0.25);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--blue2);
+  }
+  .report-arrow { color: var(--text2); font-size: 14px; }
+ 
+  /* Quote */
+  .quote-box {
+    background: rgba(245,158,11,0.06);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 10px 10px 0;
+    padding: 16px 20px;
+    margin-top: 16px;
+    font-style: italic;
+    color: var(--text2);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .quote-attr { font-style: normal; font-size: 12px; color: var(--gold); margin-top: 8px; }
+ 
+  /* Section heading */
+  .sec-heading {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .sec-sub { font-size: 14px; color: var(--text2); margin-bottom: 24px; }
+ 
+  /* Stats row */
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+  @media (max-width: 540px) { .stats-row { grid-template-columns: 1fr; } }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+  }
+  .stat-num { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: var(--blue2); }
+  .stat-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
+ 
+  footer {
+    text-align: center;
+    padding: 40px 24px;
+    color: var(--text2);
+    font-size: 12px;
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+  footer a { color: var(--blue2); text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="orb1"></div>
+<div class="orb2"></div>
+ 
+<header>
+  <div class="team-badge">50 Blessings — Capstone Project 2026</div>
+  <h1>AI Communication Toolkit<br>for Engineering Students</h1>
+  <p class="subtitle">Empowering students with professional communication skills</p>
+</header>
+ 
+<nav class="nav">
+  <button class="nav-btn active" onclick="show('home')">Overview</button>
+  <button class="nav-btn" onclick="show('email')">Email Templates</button>
+  <button class="nav-btn" onclick="show('presentation')">Presentation</button>
+  <button class="nav-btn" onclick="show('meeting')">Meetings</button>
+  <button class="nav-btn" onclick="show('resume')">Resume</button>
+  <button class="nav-btn" onclick="show('linkedin')">LinkedIn</button>
+  <button class="nav-btn" onclick="show('aitools')">AI Tools</button>
+</nav>
+ 
+<div class="container">
+ 
+  <!-- HOME -->
+  <div class="section active" id="home">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num">73%</div>
+        <div class="stat-label">of employers rank communication as top hiring criteria</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">50%+</div>
+        <div class="stat-label">of engineer's time spent on communication tasks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">6</div>
+        <div class="stat-label">toolkit modules covering all key communication skills</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">What's inside this toolkit?</div>
+      <div class="card-sub">Click any module above to get started</div>
+      <div class="tips-grid">
+        <div class="tip-card" onclick="show('email')" style="cursor:pointer">
+          <div class="tip-num">01</div>
+          <div class="tip-title">Email Templates</div>
+          <div class="tip-desc">3 ready-to-use templates for internships, professors & follow-ups</div>
+        </div>
+        <div class="tip-card" onclick="show('presentation')" style="cursor:pointer">
+          <div class="tip-num">02</div>
+          <div class="tip-title">Presentation Skills</div>
+          <div class="tip-desc">5 delivery tips + slide design best practices</div>
+        </div>
+        <div class="tip-card" onclick="show('meeting')" style="cursor:pointer">
+          <div class="tip-num">03</div>
+          <div class="tip-title">Meeting Communication</div>
+          <div class="tip-desc">Etiquette tips for virtual and in-person meetings</div>
+        </div>
+        <div class="tip-card" onclick="show('resume')" style="cursor:pointer">
+          <div class="tip-num">04</div>
+          <div class="tip-title">Resume Writing</div>
+          <div class="tip-desc">Structure, action verbs, and how to stand out</div>
+        </div>
+        <div class="tip-card" onclick="show('linkedin')" style="cursor:pointer">
+          <div class="tip-num">05</div>
+          <div class="tip-title">LinkedIn Guide</div>
+          <div class="tip-desc">Build a profile that gets noticed by recruiters</div>
+        </div>
+        <div class="tip-card" onclick="show('aitools')" style="cursor:pointer">
+          <div class="tip-num">06</div>
+          <div class="tip-title">AI Tools</div>
+          <div class="tip-desc">ChatGPT, Grammarly, Canva, Notion AI — how to use them</div>
+        </div>
+      </div>
+    </div>
+    <div class="quote-box">
+      "The single biggest problem in communication is the illusion that it has taken place."
+      <div class="quote-attr">— George Bernard Shaw</div>
+    </div>
+  </div>
+ 
+  <!-- EMAIL -->
+  <div class="section" id="email">
+    <div class="sec-heading">Email Templates</div>
+    <div class="sec-sub">Copy, personalise, and send — takes under 2 minutes</div>
+ 
+    <div class="card">
+      <div class="email-label">Template 1 — Job / Internship Application</div>
+      <div class="email-box" id="email1">
+        <strong>Subject:</strong> Application for Software Intern Role — [Your Name]<br><br>
+        Dear [Hiring Manager's Name],<br><br>
+        I am a [year] engineering student at [college] and I am writing to express my interest in the internship role at your organisation. I have attached my resume for your consideration.<br><br>
+        I would love the opportunity to discuss how I can contribute to your team. Thank you for your time.<br><br>
+        Warm regards,<br>
+        [Your Name]
+      </div>
+      <button class="copy-btn" onclick="copyText('email1', this)">Copy template</button>
+    </div>
+ 
+    <div class="card">
+      <div class="email-label">Template 2 — Email to a Professor</div>
+      <div class="email-box" id="email2">
+        <strong>Subject:</strong> Query Regarding [Subject / Project Name]<br><br>
+        Dear Professor [Name],<br><br>
+        I am [your name] from [batch/section]. I wanted to seek your guidance regarding [topic]. Could we schedule a brief meeting at your convenience?<br><br>
+        Thank you for your time.<br><br>
+        Regards,<br>
+        [Your Name]
+      </div>
+      <button class="copy-btn" onclick="copyText('email2', this)">Copy template</button>
+    </div>
+ 
+    <div class="card">
+      <div class="email-label">Template 3 — Follow-up Email</div>
+      <div class="email-box" id="email3">
+        <strong>Subject:</strong> Following Up — [Previous Topic]<br><br>
+        Dear [Name],<br><br>
+        I wanted to follow up on my previous email regarding [topic]. Please let me know if you need any additional information from my end.<br><br>
+        I look forward to hearing from you.<br><br>
+        Regards,<br>
+        [Your Name]
+      </div>
+      <button class="copy-btn" onclick="copyText('email3', this)">Copy template</button>
+    </div>
+ 
+    <div class="card">
+      <div class="card-title">Do's & Don'ts</div>
+      <div style="margin-top:16px" class="dos-grid">
+        <div class="do-box">
+          <div class="do-title">✅ Do's</div>
+          <ul>
+            <li>Use a clear, specific subject line</li>
+            <li>Keep it under 150 words</li>
+            <li>Always greet and sign off professionally</li>
+            <li>Proofread before sending</li>
+          </ul>
+        </div>
+        <div class="dont-box">
+          <div class="dont-title">❌ Don'ts</div>
+          <ul>
+            <li>Use casual language (hey, gonna, wanna)</li>
+            <li>Skip the subject line</li>
+            <li>Send without re-reading once</li>
+            <li>Use all caps or excessive punctuation</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- PRESENTATION -->
+  <div class="section" id="presentation">
+    <div class="sec-heading">Presentation Skills</div>
+    <div class="sec-sub">Deliver with confidence — every time</div>
+ 
+    <div class="tips-grid">
+      <div class="tip-card">
+        <div class="tip-num">01</div>
+        <div class="tip-title">Start with a hook</div>
+        <div class="tip-desc">Open with a surprising fact, a question, or a short story. Grab attention in the first 15 seconds.</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-num">02</div>
+        <div class="tip-title">One idea per slide</div>
+        <div class="tip-desc">Never crowd a slide. One clear idea, supported by 2–3 bullet points max.</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-num">03</div>
+        <div class="tip-title">Eye contact is key</div>
+        <div class="tip-desc">Look at your audience, not the screen. Scan the room — don't fixate on one person.</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-num">04</div>
+        <div class="tip-title">Pause for effect</div>
+        <div class="tip-desc">Silence is powerful. Slow down, pause after key points, and let the audience absorb information.</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-num">05</div>
+        <div class="tip-title">End with a takeaway</div>
+        <div class="tip-desc">Summarise in one sentence. Tell the audience exactly what you want them to remember or do next.</div>
+      </div>
+    </div>
+ 
+    <div class="card" style="margin-top:8px">
+      <div class="card-title">Slide Design Tips</div>
+      <div class="card-sub">Less is always more</div>
+      <div class="dos-grid">
+        <div class="do-box">
+          <div class="do-title">Design Rules</div>
+          <ul>
+            <li>Max 6 words per bullet point</li>
+            <li>2 fonts only — heading + body</li>
+            <li>2–3 colors throughout the deck</li>
+            <li>Use images over long paragraphs</li>
+            <li>Leave generous white space</li>
+          </ul>
+        </div>
+        <div class="dont-box">
+          <div class="dont-title">Common Mistakes</div>
+          <ul>
+            <li>Reading directly off the slide</li>
+            <li>Too many fonts and colors</li>
+            <li>Walls of text on one slide</li>
+            <li>Low contrast text on busy background</li>
+            <li>No clear visual hierarchy</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="card">
+      <div class="card-title">Recommended Resource</div>
+      <div class="card-sub">TED Talk by Celeste Headlee</div>
+      <a href="https://www.ted.com/talks/celeste_headlee_10_ways_to_have_a_better_conversation" target="_blank" style="color:var(--blue2); font-size:14px;">10 Ways to Have a Better Conversation →</a>
+    </div>
+  </div>
+ 
+  <!-- MEETING -->
+  <div class="section" id="meeting">
+    <div class="sec-heading">Meeting Communication</div>
+    <div class="sec-sub">Make every meeting count</div>
+ 
+    <div class="card">
+      <div class="card-title">5 Etiquette Rules</div>
+      <div style="margin-top:16px">
+        <div class="meeting-item">
+          <div class="meeting-icon">⏰</div>
+          <div class="meeting-text">
+            <div class="mtitle">Join 2 minutes early</div>
+            <div class="mdesc">Punctuality shows professionalism. Being late disrupts the flow for everyone.</div>
+          </div>
+        </div>
+        <div class="meeting-item">
+          <div class="meeting-icon">🔇</div>
+          <div class="meeting-text">
+            <div class="mtitle">Mute when not speaking</div>
+            <div class="mdesc">Background noise is distracting. Keep yourself muted unless you're actively talking.</div>
+          </div>
+        </div>
+        <div class="meeting-item">
+          <div class="meeting-icon">📷</div>
+          <div class="meeting-text">
+            <div class="mtitle">Keep your camera on</div>
+            <div class="mdesc">It shows engagement and builds trust. You're part of the meeting — be present.</div>
+          </div>
+        </div>
+        <div class="meeting-item">
+          <div class="meeting-icon">📝</div>
+          <div class="meeting-text">
+            <div class="mtitle">Take notes + summarise action points</div>
+            <div class="mdesc">At the end of the meeting, quickly recap: what was decided and who does what by when.</div>
+          </div>
+        </div>
+        <div class="meeting-item">
+          <div class="meeting-icon">🙋</div>
+          <div class="meeting-text">
+            <div class="mtitle">Ask questions clearly</div>
+            <div class="mdesc">"Can you clarify what you mean by X?" — specific questions get useful answers.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="quote-box">
+      Before speaking in any meeting, ask yourself three things: <strong style="color:#fff">Is it relevant? Is it the right time? Is it concise?</strong>
+    </div>
+  </div>
+ 
+  <!-- RESUME -->
+  <div class="section" id="resume">
+    <div class="sec-heading">Resume Writing Guide</div>
+    <div class="sec-sub">Structure that gets noticed by recruiters</div>
+ 
+    <div class="card">
+      <div class="card-title">Resume Structure — in this exact order</div>
+      <div class="resume-steps" style="margin-top:16px">
+        <div class="resume-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <div class="step-title">Name + Contact Info + LinkedIn URL</div>
+            <div class="step-desc">Keep it at the very top. Include phone, email, LinkedIn, and GitHub if relevant.</div>
+          </div>
+        </div>
+        <div class="resume-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <div class="step-title">Objective (2 lines max)</div>
+            <div class="step-desc">One sentence on who you are, one on what you're looking for. Be specific.</div>
+          </div>
+        </div>
+        <div class="resume-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <div class="step-title">Education</div>
+            <div class="step-desc">Degree, college, year of graduation, and CGPA (if above 7.5).</div>
+          </div>
+        </div>
+        <div class="resume-step">
+          <div class="step-num">4</div>
+          <div class="step-content">
+            <div class="step-title">Skills — Technical + Soft</div>
+            <div class="step-desc">List languages, tools, frameworks. Add soft skills like leadership, communication.</div>
+          </div>
+        </div>
+        <div class="resume-step">
+          <div class="step-num">5</div>
+          <div class="step-content">
+            <div class="step-title">Projects / Internships</div>
+            <div class="step-desc">Use action verbs: built, designed, led, improved. Quantify: "Improved speed by 30%".</div>
+          </div>
+        </div>
+        <div class="resume-step">
+          <div class="step-num">6</div>
+          <div class="step-content">
+            <div class="step-title">Certifications / Achievements</div>
+            <div class="step-desc">Coursera, NPTEL, hackathons, competitions — anything that adds credibility.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="card">
+      <div class="card-title">Key Tips</div>
+      <div class="tips-grid" style="margin-top:16px">
+        <div class="tip-card">
+          <div class="tip-title">Keep it to 1 page</div>
+          <div class="tip-desc">Recruiters spend 6–7 seconds on a resume. One tight page beats two loose ones.</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-title">Use action verbs</div>
+          <div class="tip-desc">Built, designed, led, improved, developed, managed, optimised, created.</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-title">Quantify achievements</div>
+          <div class="tip-desc">"Improved app speed by 30%" beats "worked on app performance" every time.</div>
+        </div>
+        <div class="tip-card">
+          <div class="tip-title">Tailor for every job</div>
+          <div class="tip-desc">Don't send one generic resume. Adjust skills and objective for each application.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- LINKEDIN -->
+  <div class="section" id="linkedin">
+    <div class="sec-heading">LinkedIn Profile Guide</div>
+    <div class="sec-sub">Build a profile that gets noticed</div>
+ 
+    <div class="card">
+      <table class="li-table">
+        <tr>
+          <th>Section</th>
+          <th>What to Write</th>
+        </tr>
+        <tr>
+          <td class="li-section">Headline</td>
+          <td>Your role + top skills. E.g. <em>"Engineering Student | Python | ML Enthusiast"</em></td>
+        </tr>
+        <tr>
+          <td class="li-section">About</td>
+          <td>3–4 lines: who you are, what you do, and what you're looking for. Write in first person.</td>
+        </tr>
+        <tr>
+          <td class="li-section">Experience</td>
+          <td>Internships, part-time roles, major projects with 2–3 bullet points each.</td>
+        </tr>
+        <tr>
+          <td class="li-section">Skills</td>
+          <td>Add at least 10 relevant skills. Ask peers to endorse the top ones.</td>
+        </tr>
+        <tr>
+          <td class="li-section">Photo</td>
+          <td>Professional, clear background, smiling. No selfies or group photos.</td>
+        </tr>
+        <tr>
+          <td class="li-section">Education</td>
+          <td>Add your college, degree, and any relevant coursework or activities.</td>
+        </tr>
+      </table>
+    </div>
+ 
+    <div class="quote-box">
+      💡 Connect with 5 new people in your field every week. A message as simple as <em>"I came across your profile and found your work in [field] really interesting"</em> goes a long way.
+    </div>
+  </div>
+ 
+  <!-- AI TOOLS -->
+  <div class="section" id="aitools">
+    <div class="sec-heading">AI Tools for Communication</div>
+    <div class="sec-sub">Work smarter — let AI handle the first draft</div>
+ 
+    <div class="tool-grid">
+      <div class="tool-card">
+        <div class="tool-icon" style="background:rgba(16,185,129,0.15)">🤖</div>
+        <div class="tool-name">ChatGPT</div>
+        <div class="tool-desc">Draft emails, reports, and presentation content instantly. Use it for first drafts — always edit before sending.</div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-icon" style="background:rgba(37,99,235,0.15)">✍️</div>
+        <div class="tool-name">Grammarly</div>
+        <div class="tool-desc">Fixes grammar, tone, and clarity in real time. Works in Gmail, LinkedIn, and Word.</div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-icon" style="background:rgba(245,158,11,0.15)">🎨</div>
+        <div class="tool-name">Canva</div>
+        <div class="tool-desc">Design professional slides and resumes in minutes. Free for students — tons of templates.</div>
+      </div>
+      <div class="tool-card">
+        <div class="tool-icon" style="background:rgba(139,92,246,0.15)">📋</div>
+        <div class="tool-name">Notion AI</div>
+        <div class="tool-desc">Organise notes, summarise meeting minutes, and manage project plans all in one place.</div>
+      </div>
+    </div>
+ 
+    <div class="card" style="margin-top:16px">
+      <div class="card-title">Technical Report Structure</div>
+      <div class="card-sub">Follow this order every time</div>
+      <div class="report-flow">
+        <div class="report-node">Title Page</div>
+        <div class="report-arrow">→</div>
+        <div class="report-node">Abstract</div>
+        <div class="report-arrow">→</div>
+        <div class="report-node">Introduction</div>
+        <div class="report-arrow">→</div>
+        <div class="report-node">Methodology</div>
+        <div class="report-arrow">→</div>
+        <div class="report-node">Results</div>
+        <div class="report-arrow">→</div>
+        <div class="report-node">Conclusion</div>
+        <div class="report-arrow">→</div>
+        <div class="report-node">References</div>
+      </div>
+      <div class="quote-box">💡 Write the Abstract last — it's a summary of everything, so it's easiest to write once everything else is done.</div>
+    </div>
+  </div>
+ 
+</div>
+ 
+<footer>
+  <p>Built by Team 50 Blessings — Keshav · Kavya · Harsh · Khushi · Vihaan</p>
+  <p style="margin-top:8px">Resources: <a href="https://www.ted.com/talks/celeste_headlee_10_ways_to_have_a_better_conversation" target="_blank">TED Talk</a> · <a href="https://www.youtube.com/watch?v=Unzc731iCUY" target="_blank">Presentation Guide</a> · <a href="https://grammarly.com" target="_blank">Grammarly</a> · <a href="https://canva.com" target="_blank">Canva</a> · <a href="https://notion.so" target="_blank">Notion</a></p>
+</footer>
+ 
+<script>
+function show(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const labels = {home:'Overview',email:'Email Templates',presentation:'Presentation',meeting:'Meetings',resume:'Resume',linkedin:'LinkedIn',aitools:'AI Tools'};
+  document.querySelectorAll('.nav-btn').forEach(b => { if(b.textContent.trim() === labels[id]) b.classList.add('active'); });
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+ 
+function copyText(id, btn) {
+  const el = document.getElementById(id);
+  const text = el.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy template'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
